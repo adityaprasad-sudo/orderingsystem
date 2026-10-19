@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ordering system</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+    <div class="nav">
+        <div class="navlogo">
+            <img src="./assets/logo.png" width="50px" height="50px"/>
+        </div>
+        <div class="seprator"></div>
+        <div class="navbtn">
+            <button class="navbtns " id="homebtn"> <img id="home" src="./assets/home.png" width="30px" height="30px"alt="home" /></button>
+            <button class="navbtns" id ="aboutbtn"><img id="about" src="./assets/about.png" width="30px" height="30px"/></button>
+            <button class="navbtns" id="feedbackbtn"><img id="feedback" src="./assets/feedback.png" width="30px" height="30px"/></button>
+            <button class="navbtns" id="carebtn"><img id="care" src="./assets/care.png" width="30px" height="30px"/></button>
+        </div>
+    </div>
+
+<script>
+  const homebtn = document.getElementById("homebtn")
+  const img = document.getElementById("home")
+  const aboutbtn = document.getElementById("aboutbtn")
+  const feedbackbtn = document.getElementById("feedbackbtn")
+  const carebtn = document.getElementById("carebtn")
+  const aboutimg = document.getElementById("about")
+  const feedbackimg = document.getElementById("feedback")
+  const careimg = document.getElementById("care")
+  homebtn.addEventListener('mouseover', () => {
+    img.src = "./assets/homehov.png";
+  });
+
+  homebtn.addEventListener('mouseout', () => {
+    img.src = "./assets/home.png";
+  });
+
+  aboutbtn.addEventListener('mouseover', () => {
+    aboutimg.src = "./assets/abouthov.png";
+  });
+
+  aboutbtn.addEventListener('mouseout', () => {
+    aboutimg.src = "./assets/about.png";
+  });
+
+  feedbackbtn.addEventListener('mouseover', () => {
+    feedbackimg.src = "./assets/feedbackhov.png";
+  });
+
+  feedbackbtn.addEventListener('mouseout', () => {
+    feedbackimg.src = "./assets/feedback.png";
+  });
+
+  carebtn.addEventListener('mouseover', () => {
+    careimg.src = "./assets/carehov.png";
+  });
+
+  carebtn.addEventListener('mouseout', () => {
+    careimg.src = "./assets/care.png";
+  });
+</script>
+</body>
+</html>
