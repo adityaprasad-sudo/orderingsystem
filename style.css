@@ -7,6 +7,7 @@
   justify-content: center;
   align-items: center;
   gap: 15px;
+  transition: 0.3s ease;
 }
 
 .bill{
@@ -14,7 +15,7 @@
   top: 130px;
   background-color: #ffffff;
   position: fixed;
-  width: calc(100% - 67.8%);
+  width: calc(100% - 69.7%);
   height: calc(100%);
   border-radius: 10px;
   border: 1px solid #ffffff00;
@@ -33,10 +34,20 @@
   font-weight: 700;
 }
 
-@media (max-width:1000px) { 
+@media (max-width:800px) { 
 .bill {
   display: none;
 }}
+.seprator2{
+  margin-top: 0px;
+  margin-left: 10px;
+  margin-right: 10px;
+  width: 380px;
+  height: 1px;
+  border-radius: 10px;
+  background-color: #5e5e5e;
+  opacity: 0.2;
+}
 
 .navlogo {
   position: relative;
@@ -74,6 +85,7 @@
   background-color: #ffffff;
   border: 1px solid #ffffff00;
   cursor: pointer;
+  transition: 0.3s ease-in-out;
 }
 .icon{
   width: 30px;
@@ -212,6 +224,7 @@ input[type="text"] {
   right: 0;
   display: flex;
   width: calc(100% - 60px);
+  overflow: auto;
 }
 .tabbtn:active{
   
@@ -291,7 +304,7 @@ input[type="text"] {
   overflow-x: auto;
   overflow-y: hidden;
   background-color: #ffffff;
-  width: calc(100% - 43.8%);
+  width: calc(100% - 45%);
   height: 30px;
   border-radius: 0 10px 10px 10px;
   scrollbar-width: thin;
