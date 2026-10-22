@@ -9,7 +9,6 @@
   homebtn.addEventListener('mouseover', () => {
     img.src = "./assets/homehov.png";
   });
-
   homebtn.addEventListener('mouseout', () => {
     img.src = "./assets/home.png";
   });
@@ -29,7 +28,7 @@
   feedbackbtn.addEventListener('mouseout', () => {
     feedbackimg.src = "./assets/feedback.png";
   });
-
+let tabs = 1;
   carebtn.addEventListener('mouseover', () => {
     careimg.src = "./assets/carehov.png";
   });
@@ -93,8 +92,13 @@ itemcard.forEach((card,index) => {
     })
     if(crossbtn){
         crossbtn.addEventListener("click", (e) => {
+            if(tabs>1){
             e.stopPropagation();
-            closeorder(orderid, tabel);
+            closeorder(orderid, tabel); 
+            tabs--;}
+            else{
+                alert("atleast have one order open");
+            }
         })
     }
   }
@@ -121,6 +125,7 @@ itemcard.forEach((card,index) => {
         tableselec.value = orders[orderid].table
     }
     renderAll();}
+    
     function closeorder(orderid, tabel)
     {
         delete orders[orderid];
@@ -134,6 +139,7 @@ itemcard.forEach((card,index) => {
         }
     }
     addbtn.addEventListener("click", () => {
+        tabs++;
         const newid = String(nextorderno++);
         orders[newid] = { table: tableselec.value, items: {} };
         const newtab = document.createElement("div")

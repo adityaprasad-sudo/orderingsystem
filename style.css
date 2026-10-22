@@ -77,7 +77,52 @@
   background-color: #5e5e5e;
   opacity: 0.2;
 }
+.payment{
+  width: 120px;
+  height: 120px;
+  background-color: #000000;
 
+}
+.paymentgate{
+   width:100vw;
+   height:100vh;
+   display: grid;
+  place-items: center;
+
+}
+.cross2{
+  width: 30px;
+  height: 30px;
+  font-size: 15px;
+  background-color: #7777774f;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.cross2:hover{
+  background-color: #77777731 ;
+
+}
+.rectanglepay{
+  width: 350px;
+  height: 404px;
+  background-color: #fdfdfd;
+  border-radius: 20px;
+  padding: 10px;
+}
+.overlay{
+  top: 0;
+  left: 0;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  background-color: #00000030;
+  overflow: hidden;
+  z-index: 99999999999999;
+}
 .navbtns{
   width: 50px;
   height: 50px;
