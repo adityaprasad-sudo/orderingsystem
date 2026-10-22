@@ -77,7 +77,7 @@ itemcard.forEach((card,index) => {
     if(title.toLowerCase().includes("mushroom")){
         card.dataset.category = "Veg"
     }else{
-        card.dataset.category = "Nonveg"
+        card.dataset.category = "NonVeg"
     }
 })
   const ordernovalue = document.querySelector(".orderno .value")
@@ -138,7 +138,7 @@ itemcard.forEach((card,index) => {
         orders[newid] = { table: tableselec.value, items: {} };
         const newtab = document.createElement("div")
         newtab.className = "tabbtn"
-        newtab.innerText = `Order #${newid}<div class="cross">✖</div>`
+        newtab.innerHTML = `Order #${newid}<div class="cross">✖</div>`
         tabscunt.appendChild(newtab)
         tabshi(newtab,newid)
         switchorder(newid)
@@ -171,7 +171,7 @@ itemcard.forEach((card,index) => {
             const cardfoot = card.querySelector(".cardfoot")
             const currentqty = cart[itemid] ? cart[itemid].qty : 0;
             const oldshi = cardfoot.querySelector(".addbtncard, .qtycontrol")
-            if(oldshi ) oldshi.remove();
+            if(oldshi) oldshi.remove();
             if(currentqty === 0){
                 const addbtn = document.createElement("button")
                 addbtn.className = "addbtncard"
@@ -185,7 +185,7 @@ itemcard.forEach((card,index) => {
                 qtyctrl.className = "qtycontrol"
                 qtyctrl.style.marginRight = "10px"
                 qtyctrl.style.marginBottom = "10px"
-                qtyctrl.innerHTML = `<button class="qtybtn">-</button><span>${currentqty}</span><button class="qtybtn plus">+</button>`
+                qtyctrl.innerHTML = `<button class="qtybtn minus">-</button><span>${currentqty}</span><button class="qtybtn plus">+</button>`
                 qtyctrl.querySelector(".minus").addEventListener("click", () => itemquantity(itemid, title, price, -1))
                 qtyctrl.querySelector(".plus").addEventListener("click", () => itemquantity(itemid, title, price, 1))
                 cardfoot.appendChild(qtyctrl)
@@ -207,21 +207,21 @@ itemcard.forEach((card,index) => {
         }
         warnbox.style.display = "none"
         billybox.style.display = "flex"
-        billybox.style.display = "column"
-        billybox.style.height = "calc(100vh -140px)"
+        billybox.style.flexDirection = "column"
+        billybox.style.height = "calc(100vh - 140px)"
         ordernovalue.textContent = `#${currentorderno}`
         let toitems = 0;
         let subtotal = 0;
         billitmecontainer.innerHTML = "";
-        itemkeys.forEach((itemid) => {
+        itemkey.forEach((itemid) => {
             const item = cart[itemid]
             toitems += item.qty
             subtotal += item.price * item.qty
             const row = document.createElement("div")
             row.className = "itemrowbill"
-            row.innerText = ` <div class="iteminfo>
+            row.innerHTML = ` <div class="iteminfo">
             <div class="itemtitle">${item.title}</div>
-            <div class="itemprice">${(item.price * item.qty).toFixed(2)}</div>
+            <div class="itemprice">$${(item.price * item.qty).toFixed(2)}</div>
             </div>
             <div class="qtycontrol">
             <button class="qtybtn minus">-</button>
@@ -236,9 +236,45 @@ itemcard.forEach((card,index) => {
         preptimevalue.textContent = `${15 + toitems * 2} min`
         const tax = subtotal * 0.05;
         const grandtotal = subtotal + tax;
-
+        billfoot.innerHTML = `<div class="seperator2" style="width: auto;"></div>
+        <div class="billsum"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+        <div class="billsum"><span>Tax(5%)</span><span>$${tax.toFixed(2)}</span></div>
+        <div class="billsum total"><span>total</span><span>$${grandtotal.toFixed(2)}</span></div>
+        <button class="checkoutbtn">Checkout(YES!)($${grandtotal.toFixed(2)})</button>`
+        billfoot.querySelector(".checkoutbtn").addEventListener("click", () => {
+            console.log(`Order #${currentorderno}`)
+            orders[currentorderno].items = {}
+            renderAll();
+        })
     }
     function renderAll(){
         cardbtn()
         rendermoney()
     }
+    function filterlogic(){
+        const filter = selectinput.value.toLowerCase().trim();
+        itemcard.forEach((card) =>{
+            const title = card.dataset.title.toLowerCase();
+            const desc = card.querySelector("p").innerText.toLowerCase();
+            const category = card.dataset.category
+            const match = title.includes(filter) || desc.includes(filter)
+            const matchcat = actcat === "All" || category === actcat;
+            card.style.display = (match && matchcat) ? "flex":"none"
+        })
+    }
+    selectinput.addEventListener("input", filterlogic)
+    filterbtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            actcat = btn.innerText.trim()
+            filterbtns.forEach((b) =>{
+                b.style.backgroundColor = "#f0f0f0";
+                b.style.color = "#333"
+                b.style.borderColor = "#e0e0e0"
+            })
+            btn.style.backgroundColor = "#ffffff"
+            btn.style.color = "#333"
+            btn.style.borderColor = "#ee3a03"
+            filterlogic()
+        })
+    })
+    switchorder("1");
