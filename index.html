@@ -19,9 +19,19 @@
   <div class="overlay">
      <div class="paymentgate">
       <div class="rectanglepay">
-        <div class="qrcode"></div>
+        
         <div class="cross2" >✖</div>
+        <div class="payhead">
+          <h3 class="paytitle">Scan to Pay</h3>
+          <p class="paysubtitle">Scan with your mobile camera</p>
+        <div class="qrcode">
+          <img src="http://localhost:8000/qrcode.png" id="qrimg" alt="paymentqr" width="200px" height="200px" />
+        </div>
+        <div id="paystatid" class="paystat">
+          <h1>Scan to Pay(waiting for payment)</h1>
+        </div>
       </div>
+    </div>
      </div>
   </div>
   
