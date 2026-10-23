@@ -16,19 +16,20 @@
 </head>
 
 <body>
-  <div class="overlay">
+  <div class="overlay" id="over">
      <div class="paymentgate">
       <div class="rectanglepay">
         
-        <div class="cross2" >✖</div>
+        <div class="cross2" id="cross2" >✖</div>
         <div class="payhead">
           <h3 class="paytitle">Scan to Pay</h3>
           <p class="paysubtitle">Scan with your mobile camera</p>
         <div class="qrcode">
           <img src="http://localhost:8000/qrcode.png" id="qrimg" alt="paymentqr" width="200px" height="200px" />
+          <video src="./qrcode/videos/tickani.mp4" class="payinganima" id="payingani" width="300px" height="300px" autoplay loop muted></video>
         </div>
         <div id="paystatid" class="paystat">
-          <h1>Scan to Pay(waiting for payment)</h1>
+          <h1 id="amount">Scan to Pay<br>(waiting for payment)</h1>
         </div>
       </div>
     </div>

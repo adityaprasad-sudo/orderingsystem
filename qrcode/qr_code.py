@@ -3,7 +3,15 @@ import qrcode
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.mount("/videos", StaticFiles(directory="videos"), name="videos")
 conneceted_shi: list[WebSocket] = []
 def immastealyoip(): #just kidding i used this to attach the ip link in the qr code

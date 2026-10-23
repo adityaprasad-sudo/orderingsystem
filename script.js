@@ -79,6 +79,28 @@ itemcard.forEach((card,index) => {
         card.dataset.category = "NonVeg"
     }
 })
+const qrimg = document.getElementById("qrimg")
+const payingani = document.getElementById("payingani")
+const socket = new WebSocket("ws://localhost:8000/itsdonebro");
+socket.onopen = () => {
+  console.log("Connected to payment WebSocket server.");
+};
+socket.onmessage = (event) => {
+    console.log(event.data)
+    const data = JSON.parse(event.data)
+    if(data.status === true){
+        const status = document.getElementById("paystatid")
+        if(status){
+            status.textContent = "Payment Successful"
+            status.classList.add("success")
+            qrimg.style.display = "none"
+            payingani.style.display = "flex"
+            setTimeout(() => {
+                overlay.style.display = "none"
+            },3000)
+        }
+    }
+}
   const ordernovalue = document.querySelector(".orderno .value")
   const preptimevalue = document.querySelector(".estimatedtime .value")
   function tabshi(tabel,orderid){
@@ -102,12 +124,19 @@ itemcard.forEach((card,index) => {
         })
     }
   }
+  
   document.querySelectorAll(".tabbtn").forEach((tabel) => {
       const match = tabel.innerText.match(/#(\d+)/);
       if (match){
         tabshi(tabel,match[1])
       }
   })
+  const overlay = document.getElementById("over")
+  const cross2 = document.getElementById("cross2")
+  cross2.addEventListener("click", () => {
+      overlay.style.display = "none"
+  })
+
   function switchorder(orderid){
     currentorderno = orderid
     document.querySelectorAll(".tabbtn").forEach((tab) => {
@@ -168,6 +197,7 @@ itemcard.forEach((card,index) => {
         }
         renderAll()
     }
+    let totalfinale = 0
     function cardbtn(){
         const cart = (currentorderno && orders[currentorderno]) ? orders[currentorderno].items : {};
         itemcard.forEach((card) => {
@@ -242,13 +272,16 @@ itemcard.forEach((card,index) => {
         preptimevalue.textContent = `${15 + toitems * 2} min`
         const tax = subtotal * 0.05;
         const grandtotal = subtotal + tax;
+        totalfinale = grandtotal;
         billfoot.innerHTML = `<div class="seperator2" style="width: auto;"></div>
         <div class="billsum"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
         <div class="billsum"><span>Tax(5%)</span><span>$${tax.toFixed(2)}</span></div>
         <div class="billsum total"><span>total</span><span>$${grandtotal.toFixed(2)}</span></div>
         <button class="checkoutbtn">Checkout(YES!)($${grandtotal.toFixed(2)})</button>`
         billfoot.querySelector(".checkoutbtn").addEventListener("click", () => {
-            console.log(`Order #${currentorderno}`)
+                amountchig.textContent = "Scan to Pay $" + totalfinale.toFixed(2); ;
+
+            overlay.style.display = "flex"
             orders[currentorderno].items = {}
             renderAll();
         })
@@ -283,4 +316,5 @@ itemcard.forEach((card,index) => {
             filterlogic()
         })
     })
+    const amountchig = document.getElementById("amount")
     switchorder("1");
