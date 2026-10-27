@@ -516,6 +516,78 @@ input[type="text"] {
   align-items: center;
   gap: 5px;
 }
+.textshit{
+  font-family: "Finger Paint", sans-serif;
+  font-size: clamp(0.2rem ,1.3vw,2rem);
+  color: #ee3a03;
+  position: absolute;
+  top: 22px;
+  left:40px;
+}
+.nextuprect{
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  width:25%;
+  height: 30%;
+  background-color: #636262;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-family: "Abel", sans-serif;
+  font-size: 25px;
+  font-weight: 300;
+  transition:ease-in-out 0.1s;
+}
+.nextuprect:hover{
+  transform: scale(1.05);
+}
+.textshit2{
+  font-family: "Finger Paint", sans-serif;
+  font-size: clamp(0.2rem ,1.3vw,2rem);
+  color: #ee3a03;
+  position: absolute;
+  bottom: 20px;
+  left:30px;
+}
+.queuerect{
+  position: absolute;
+  top: calc(100% - 95%);
+  left: calc(100% - 78%);
+  width:60%;
+  height: 20%;
+  background-color: #000000;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition:ease-in-out 0.1s;
+}
+.queuerect:hover{
+  transform: scale(1.05);
+}
+.queuerect2{
+  position: absolute;
+  bottom: 15px;
+  right: 25px;
+  width:25%;
+  height: 30%;
+  background-color: #636262;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-family: "Abel", sans-serif;
+  font-size: 25px;
+  font-weight: 300;
+  transition:ease-in-out 0.1s;
+}
+.queuerect2:hover{
+  transform: scale(1.05);
+}
 .warn{
   display: none;
   height: 70%;

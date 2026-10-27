@@ -1,4 +1,4 @@
- const homebtn = document.getElementById("homebtn")
+  const homebtn = document.getElementById("homebtn")
   const img = document.getElementById("home")
   const aboutbtn = document.getElementById("aboutbtn")
   const feedbackbtn = document.getElementById("feedbackbtn")
@@ -237,7 +237,7 @@ socket.onmessage = (event) => {
         const cart = orders[currentorderno].items
         const itemkey = Object.keys(cart)
         if(itemkey.length === 0){
-            warnbox.style.display = "flex"
+            warnbox.style.display = "none"
             billybox.style.display = "none"
             return
         }
