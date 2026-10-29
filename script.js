@@ -8,34 +8,34 @@
   const careimg = document.getElementById("care")
   homebtn.addEventListener('mouseover', () => {
     img.src = "./assets/homehov.png";
-  });
+  })
   homebtn.addEventListener('mouseout', () => {
     img.src = "./assets/home.png";
-  });
+  })
 
   aboutbtn.addEventListener('mouseover', () => {
     aboutimg.src = "./assets/abouthov.png";
-  });
+  })
 
   aboutbtn.addEventListener('mouseout', () => {
     aboutimg.src = "./assets/about.png";
-  });
+  })
 
   feedbackbtn.addEventListener('mouseover', () => {
     feedbackimg.src = "./assets/feedbackhov.png";
-  });
+  })
 
   feedbackbtn.addEventListener('mouseout', () => {
     feedbackimg.src = "./assets/feedback.png";
-  });
+  })
 let tabs = 1;
   carebtn.addEventListener('mouseover', () => {
     careimg.src = "./assets/carehov.png";
-  });
+  })
 
   carebtn.addEventListener('mouseout', () => {
     careimg.src = "./assets/care.png";
-  });
+  })
   let nextorderno = 2
   let currentorderno = 1
   let actcat = "All"
@@ -237,7 +237,7 @@ socket.onmessage = (event) => {
         const cart = orders[currentorderno].items
         const itemkey = Object.keys(cart)
         if(itemkey.length === 0){
-            warnbox.style.display = "none"
+            warnbox.style.display =  "none"
             billybox.style.display = "none"
             return
         }

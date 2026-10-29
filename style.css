@@ -552,10 +552,107 @@ input[type="text"] {
   bottom: 20px;
   left:30px;
 }
+.rectangleshi{
+  position: absolute;
+  top: calc(100% - 71.5%);
+  left: 20px;
+  width:90%;
+  height: 42%;
+  background-color: #e2e2e2;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-family: "Abel", sans-serif;
+}
+.ordersum{
+  
+}
+.paynow{
+  position: absolute;
+  top: calc(100% - 26.5%);
+  right: 25px;
+  width:25%;
+  height: 5%;
+  background-color: #ee3a03;
+  border-radius: 12px;
+  display: flex;
+  border: 0;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-family: "Abel", sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  transition:ease-in-out 0.1s;
+}
+.paynow:hover{
+  background-color: #ff2200;
+  border-radius: 8px;
+  transform: scale(1.05);
+}
+.paynow:active{
+  transform: scale(0.95);
+}
+.cancelbtn{
+  position: absolute;
+  top: calc(100% - 26.5%);
+  right: calc(100% - 63%);
+  width:25%;
+  height: 5%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f03c0f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f03c0f;
+  font-family: "Abel", sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  transition:ease-in-out 0.1s;
+}
+.cancelbtn:hover{
+  background-color: #ffffff;
+  border-radius: 8px;
+  transform: scale(1.05);
+}
+.cancelbtn:active{
+  transform: scale(0.95);
+}
+
+.contactchingo{
+  border: 1px;
+  position: absolute;
+  top: calc(100% - 26.5%);
+  left: 25px;
+  width:25%;
+  height: 5%;
+  background-color: #ee3a03;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  font-family: "Abel", sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  transition:ease-in-out 0.1s;
+}
+.contactchingo:hover{
+  background-color: #ff2200;
+  border-radius: 8px;
+  transform: scale(1.05);
+}
+.contactchingo:active{
+  transform: scale(0.95);
+}
+
 .queuerect{
   position: absolute;
   top: calc(100% - 95%);
-  left: calc(100% - 78%);
+  left: calc(100% - 80%);
   width:60%;
   height: 20%;
   background-color: #000000;
