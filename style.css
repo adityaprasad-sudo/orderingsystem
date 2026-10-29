@@ -9,7 +9,15 @@
   gap: 15px;
   transition: 0.3s ease;
 }
-
+.afterpay{
+  display: none;
+}
+button:disabled,
+.addbtncard:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
 .bill{
   right: 10px;
   top: 130px;
@@ -560,14 +568,31 @@ input[type="text"] {
   height: 42%;
   background-color: #e2e2e2;
   border-radius: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   color: #ffffff;
   font-family: "Abel", sans-serif;
 }
-.ordersum{
-  
+.ordersumshi{
+  position: absolute;
+  top: 5px;
+  left: calc(100% - 64%);
+  background-color: #e2e2e2;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #6b3e3e;
+  font-family: "Abel", sans-serif;
+}
+.seprator3{
+  position: absolute;
+  top: calc(100% - 90%);
+  left: calc(100% - 95%);
+  width:90%;
+  height: 2px;
+  background-color: #161616;
+  border-radius: 20px;
+  color: #ffffff;
+  font-family: "Abel", sans-serif;
 }
 .paynow{
   position: absolute;

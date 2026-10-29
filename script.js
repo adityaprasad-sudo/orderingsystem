@@ -197,7 +197,10 @@ socket.onmessage = (event) => {
         }
         renderAll()
     }
+        let lockshi = false
+
     let totalfinale = 0
+    const btn = document.getElementById("addbtn22")
     function cardbtn(){
         const cart = (currentorderno && orders[currentorderno]) ? orders[currentorderno].items : {};
         itemcard.forEach((card) => {
@@ -211,10 +214,16 @@ socket.onmessage = (event) => {
             if(currentqty === 0){
                 const addbtn = document.createElement("button")
                 addbtn.className = "addbtncard"
+                
                 addbtn.innerText = "+ Add"
                 addbtn.addEventListener("click", () => {
                     itemquantity(itemid, title, price, 1)
                 })
+                if(lockshi){
+                    console.log(btn)
+                    btn.disabled = true
+                    console.log("disabled")
+                }
                 cardfoot.appendChild(addbtn)
             } else{
                 const qtyctrl = document.createElement("div")
@@ -228,6 +237,7 @@ socket.onmessage = (event) => {
             }
         })
     }
+    const afterpay = document.getElementById("afterpayid")
     function rendermoney(){
         if(!currentorderno || !orders[currentorderno]){
             warnbox.style.display = "flex"
@@ -279,8 +289,8 @@ socket.onmessage = (event) => {
         <div class="billsum total"><span>total</span><span>$${grandtotal.toFixed(2)}</span></div>
         <button class="checkoutbtn">Checkout(YES!)($${grandtotal.toFixed(2)})</button>`
         billfoot.querySelector(".checkoutbtn").addEventListener("click", () => {
-                amountchig.textContent = "Scan to Pay $" + totalfinale.toFixed(2); ;
-
+            amountchig.textContent = "Scan to Pay $" + totalfinale.toFixed(2);
+            lockshi = true
             overlay.style.display = "flex"
             orders[currentorderno].items = {}
             renderAll();
