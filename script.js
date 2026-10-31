@@ -37,19 +37,20 @@ let tabs = 1;
     careimg.src = "./assets/care.png";
   })
   let nextorderno = 2
+  let payedorder = 0
   let currentorderno = 1
   let actcat = "All"
   const orders = {
-    "1": { table: "tb1", items: {} },
-    "2": { table: "tb2", items: {} },
-    "3": { table: "tb3", items: {} },
-    "4": { table: "tb4", items: {} },
-    "5": { table: "tb5", items: {} },
-    "6": { table: "tb6", items: {} },
-    "7": { table: "tb7", items: {} },
-    "8": { table: "tb8", items: {} },
-    "9": { table: "tb9", items: {} },
-    "10": { table: "tb10", items: {} },
+    "1": { table: "tb1", items: {}, locked: false },
+    "2": { table: "tb2", items: {},locked: false },
+    "3": { table: "tb3", items: {}, locked: false },
+    "4": { table: "tb4", items: {}, locked: false },
+    "5": { table: "tb5", items: {},locked: false },
+    "6": { table: "tb6", items: {}, locked: false},
+    "7": { table: "tb7", items: {}, locked: false },
+    "8": { table: "tb8", items: {}, locked: false },
+    "9": { table: "tb9", items: {}, locked: false },
+    "10": { table: "tb10", items: {}, locked: false },
   }
   const tabscunt = document.querySelector(".tabs")
   const addbtn = document.querySelector(".addbtn")
@@ -88,6 +89,7 @@ socket.onopen = () => {
 socket.onmessage = (event) => {
     console.log(event.data)
     const data = JSON.parse(event.data)
+    pricesender()
     if(data.status === true){
         const status = document.getElementById("paystatid")
         if(status){
@@ -170,7 +172,7 @@ socket.onmessage = (event) => {
     addbtn.addEventListener("click", () => {
         tabs++;
         const newid = String(nextorderno++);
-        orders[newid] = { table: tableselec.value, items: {} };
+        orders[newid] = { table: tableselec.value, items: {}, locked: false };
         const newtab = document.createElement("div")
         newtab.className = "tabbtn"
         newtab.innerHTML = `Order #${newid}<div class="cross">✖</div>`
@@ -197,12 +199,12 @@ socket.onmessage = (event) => {
         }
         renderAll()
     }
-        let lockshi = false
-
+    let lockshi = false
     let totalfinale = 0
-    const btn = document.getElementById("addbtn22")
     function cardbtn(){
+        const curroder = currentorderno ? orders[currentorderno] : null;
         const cart = (currentorderno && orders[currentorderno]) ? orders[currentorderno].items : {};
+        const lockedshi = curroder ? curroder.locked : false;
         itemcard.forEach((card) => {
             const itemid = card.dataset.id
             const title = card.dataset.title
@@ -215,14 +217,13 @@ socket.onmessage = (event) => {
                 const addbtn = document.createElement("button")
                 addbtn.className = "addbtncard"
                 
-                addbtn.innerText = "+ Add"
-                addbtn.addEventListener("click", () => {
+                addbtn.innerText = lockedshi ? "Lock": "+ Add"
+                addbtn.disabled = lockedshi
+                
+                if(!lockedshi){
+                    addbtn.addEventListener("click", () => {
                     itemquantity(itemid, title, price, 1)
                 })
-                if(lockshi){
-                    console.log(btn)
-                    btn.disabled = true
-                    console.log("disabled")
                 }
                 cardfoot.appendChild(addbtn)
             } else{
@@ -230,11 +231,16 @@ socket.onmessage = (event) => {
                 qtyctrl.className = "qtycontrol"
                 qtyctrl.style.marginRight = "10px"
                 qtyctrl.style.marginBottom = "10px"
-                qtyctrl.innerHTML = `<button class="qtybtn minus">-</button><span>${currentqty}</span><button class="qtybtn plus">+</button>`
+                qtyctrl.innerHTML = `
+                <button class="qtybtn minus" ${lockedshi ? "disabled" : ""}>-</button>
+                <span>${currentqty}</span>
+                <button class="qtybtn plus" ${lockedshi ? "disabled" : ""}>+</button>
+                `
                 qtyctrl.querySelector(".minus").addEventListener("click", () => itemquantity(itemid, title, price, -1))
                 qtyctrl.querySelector(".plus").addEventListener("click", () => itemquantity(itemid, title, price, 1))
                 cardfoot.appendChild(qtyctrl)
             }
+            const btn = document.getElementById("addbtn22")
         })
     }
     const afterpay = document.getElementById("afterpayid")
@@ -293,6 +299,7 @@ socket.onmessage = (event) => {
             lockshi = true
             overlay.style.display = "flex"
             orders[currentorderno].items = {}
+            pricesender()
             renderAll();
         })
     }
@@ -328,3 +335,16 @@ socket.onmessage = (event) => {
     })
     const amountchig = document.getElementById("amount")
     switchorder("1");
+    async function pricesender(){
+        const response = await fetch("http://localhost:8000/pricesenderapi",{
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                price: String(totalfinale)
+            })
+        })
+        console.log(await response.json())
+
+    }

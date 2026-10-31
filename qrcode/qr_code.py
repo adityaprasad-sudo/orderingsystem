@@ -1,5 +1,7 @@
 import socket
 import qrcode
+import math
+from pydantic import BaseModel
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
@@ -12,6 +14,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+class prices(BaseModel):
+    price: str
+
 app.mount("/videos", StaticFiles(directory="videos"), name="videos")
 conneceted_shi: list[WebSocket] = []
 def immastealyoip(): #just kidding i used this to attach the ip link in the qr code
@@ -24,7 +29,7 @@ def immastealyoip(): #just kidding i used this to attach the ip link in the qr c
     finally:
         s.close()
     return ip
-
+daprice = 0
 localip = immastealyoip()
 port = 8000
 scanurl = f"http://{localip}:{port}/scan"
@@ -39,6 +44,13 @@ img.save("qrcode.png")
 @app.get("/qrcode.png")
 async def qrco():
     return FileResponse("qrcode.png", media_type="image/png")
+@app.post("/pricesenderapi")
+async def pricesender(data: prices):
+    global daprice
+    daprice = math.trunc(float(data.price) * 100)/100
+    return {"status": True, "amount": data.price}
+
+
 @app.websocket("/itsdonebro")
 async def endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -48,12 +60,13 @@ async def endpoint(websocket: WebSocket):
             await websocket.receive_text()
     except Exception:
             conneceted_shi.remove(websocket)
+shisha = 99
 @app.get("/scan", response_class=HTMLResponse)
 async def scan():
   
   for client in conneceted_shi:
     await client.send_json({"status": True})
-  return """
+  return f"""
     <!DOCTYPE html>
     <html>
       <head>
@@ -61,23 +74,21 @@ async def scan():
         <title>Payment Confirmed!</title>
       </head>
       <style>
-        body {
+        body {{
           font-family: sans-serif; 
           text-align: center; 
           margin-top: 60px; 
           background: #ffffff;
-        }
+        }}
 
       </style>
       <body>
         <video src="/videos/tickani.mp4" width="300px" height="300px" autoplay loop muted></video>
         <h1 style="color: #16a34a; font-size: 40px; margin-bottom: 8px;">Success</h1>
-        <p style="font-size: 18px; color: #444;">Payment done! Look at your order screen.</p>
+        <p style="font-size: 18px; color: #444;">Payment of {daprice} done ! Look at your order screen. Thank You!!!</p>
     </body>
 </html>
     """
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)    
-
-
+    uvicorn.run(app, host="0.0.0.0", port=8000)
