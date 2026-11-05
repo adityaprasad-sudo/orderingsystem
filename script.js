@@ -185,6 +185,30 @@ socket.onmessage = (event) => {
             orders[currentorderno].table = tableselec.value
         }
     })
+    const sumcont = document.getElementById("summarycont")
+    function rendersummary(data){
+        if(!data){
+            sumcont.innerHTML = "<p>No orders yet</p>"
+            return
+        }
+        const itemhtml = sumcont.items.map(item => `
+        <div class="sum-row">
+            <span>${item.qty}x ${item.title}</span>
+            <span>$${item.line_total.toFixed(2)}</span>
+        </div>
+        `).join("");
+        sumcont.innerHTML = `
+        ${itemhtml}
+        <div class="sumrow" style="color:#555; border:none;">
+        <span>Tax (5%)</span>
+        <span>$${data.tax.toFixed(2)}</span>
+        </div>
+        <div class="sumtotal">
+        <span>Total</span>
+        <span>$${data.total.toFixed(2)}</span>
+        </div>
+        `
+    }
     function itemquantity(itemid, title, price, delta){
         if(!currentorderno || !orders[currentorderno]){
             addbtn.click()
@@ -250,6 +274,14 @@ socket.onmessage = (event) => {
             billybox.style.display = "none"
             return
         }
+        const curroder = orders[currentorderno]
+        if(curroder.locked && curroder.summary){
+            warnbox.style.display = "none"
+            billybox.style.display = "none"
+            afterpay.style.display = "flex"
+            rendersummary(curroder.summary)
+        }
+        afterpay.style.display = "none"
         const cart = orders[currentorderno].items
         const itemkey = Object.keys(cart)
         if(itemkey.length === 0){
@@ -295,14 +327,48 @@ socket.onmessage = (event) => {
         <div class="billsum total"><span>total</span><span>$${grandtotal.toFixed(2)}</span></div>
         <button class="checkoutbtn">Checkout(YES!)($${grandtotal.toFixed(2)})</button>`
         billfoot.querySelector(".checkoutbtn").addEventListener("click", () => {
+            const ordersumjson = {
+                orderid: String(currentorderno),
+                table: curroder.table,
+                items: itemkey.map(id =>({
+                    title: cart[id].title,
+                    qty: cart[id].qty,
+                    price: cart[id].price,
+                    linetotal: Number((cart[id].price * cart[id].qty).toFixed(2))
+
+                })),
+                subtotal: Number(subtotal.toFixed(2)),
+                tax: Number(tax.toFixed(2)),
+                total: Number(grandtotal.toFixed(2))
+            }
+            curroder.locked = true
+            curroder.summary = ordersumjson
             amountchig.textContent = "Scan to Pay $" + totalfinale.toFixed(2);
             lockshi = true
             overlay.style.display = "flex"
             orders[currentorderno].items = {}
-            pricesender()
+            pricesender(ordersumjson)
             renderAll();
         })
     }
+    document.querySelector(".paynow").addEventListener("click", () => {
+    const cur = orders[currentorderno];
+    if (cur && cur.summary) {
+        amountchig.textContent = "Scan to Pay $" + cur.summary.total.toFixed(2);
+        qrimg.style.display = "block";
+        payingani.style.display = "none";
+        overlay.style.display = "flex";
+        pricesender(cur.summary);
+    }
+    })
+    document.querySelector(".cancelbtn").addEventListener("click", () => {
+    if (orders[currentorderno]) {
+        orders[currentorderno].locked = false;
+        orders[currentorderno].items = {};
+        delete orders[currentorderno].summary;
+        renderAll();
+    }
+});
     function renderAll(){
         cardbtn()
         rendermoney()
@@ -335,15 +401,15 @@ socket.onmessage = (event) => {
     })
     const amountchig = document.getElementById("amount")
     switchorder("1");
-    async function pricesender(){
+    async function pricesender(sumdata){
         const response = await fetch("http://localhost:8000/pricesenderapi",{
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                price: String(totalfinale)
-            })
+            body: JSON.stringify(
+               sumdata
+            )
         })
         console.log(await response.json())
 

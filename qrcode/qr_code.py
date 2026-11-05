@@ -6,6 +6,7 @@ from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from typing import List
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -14,9 +15,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-class prices(BaseModel):
-    price: str
+class Orderitems(BaseModel):
+    title: str
+    qty: int
+    price: float
+    line_total: float
+class Ordersum(BaseModel):
+    orderid: str
+    table:str
+    items: List[Orderitems]
+    subtotal: float
+    tax: float
+    total: float    
 
+lastestorder : Ordersum | None = None
 app.mount("/videos", StaticFiles(directory="videos"), name="videos")
 conneceted_shi: list[WebSocket] = []
 def immastealyoip(): #just kidding i used this to attach the ip link in the qr code
@@ -45,10 +57,10 @@ img.save("qrcode.png")
 async def qrco():
     return FileResponse("qrcode.png", media_type="image/png")
 @app.post("/pricesenderapi")
-async def pricesender(data: prices):
-    global daprice
-    daprice = round(float(data.price) * 100)/100
-    return {"status": True, "amount": data.price}
+async def pricesender(data: ordersum):
+    global latestorder
+    latestorder = data
+    return {"status": True, "order": data.model_dump()}
 @app.websocket("/itsdonebro")
 async def endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -64,6 +76,30 @@ async def scan():
   
   for client in conneceted_shi:
     await client.send_json({"status": True})
+    if lastestorder:
+        itemhtml = "".join([f"""<div style="display:flex; justify-content:space-between; margin: 6px 0; border-bottom: 1px dashed #ccc; padding-bottom: 4px;">
+                  <span>{item.qty}x {item.title}</span>
+                  <span>${item.line_total:.2f}</span>
+                </div>""" 
+                for item in lastestorder.items])
+        receipt_html = f"""
+        <div style="max-width: 320px; margin: 16px auto; background: #fff; padding: 16px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: left; font-size: 14px; color: #222;">
+            <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; text-align: center;">
+                Order #{lastestorder.orderid} ({lastestorder.table.upper()})
+            </div>
+            {itemhtml}
+            <div style="display:flex; justify-content:space-between; color:#666; margin-top: 8px;">
+                <span>Tax (5%)</span><span>${lastestorder.tax:.2f}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size: 17px; margin-top: 8px; border-top: 2px solid #222; padding-top: 6px;">
+                <span>Total Paid</span><span>${lastestorder.total:.2f}</span>
+            </div>
+        </div>
+        """
+        amount_str = f"${lastestorder.total:.2f}"
+    else:
+        receipt_html = "<p>No active order items found.</p>"
+        amount_str = "$0.00"
   return f"""
 <!DOCTYPE html>
     <html>
@@ -93,7 +129,8 @@ async def scan():
         <video src="./videos/tickani.mp4" width="300px" height="300px" autoplay loop muted></video>
         <video src="./videos/tickani3.mp4" style="position: absolute; top:1px; left: 5px;" autoplay loop muted></video>
         <h1 style="color: #16a34a; font-size: 40px; margin-bottom: 8px;">Success!!!</h1>
-        <p style="font-size: 18px; color: #444;">Payment of {daprice} done ! Look at your order screen. Thank You!!!</p>
+        <p style="font-size: 18px; color: #444;">Payment of {amount_str} done ! Look at your order screen. Thank You!!!</p>
+        {receipt_html}
     </body>
 </html>
     """
