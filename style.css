@@ -10,7 +10,7 @@
   transition: 0.3s ease;
 }
 .afterpay{
-  display: none;
+  display: flex;
 }
 button:disabled,
 .addbtncard:disabled {
@@ -418,8 +418,11 @@ input[type="text"] {
   left: 30px;
   right: 0;
   display: flex;
-  width: calc(100% - 60px);
+  z-index: 100;
+  width: calc(100% - 40%);
   overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #ee3a03 #f1f1f1;
 }
 .tabbtn:active{
   

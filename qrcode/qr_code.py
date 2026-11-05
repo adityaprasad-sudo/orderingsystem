@@ -47,10 +47,8 @@ async def qrco():
 @app.post("/pricesenderapi")
 async def pricesender(data: prices):
     global daprice
-    daprice = math.trunc(float(data.price) * 100)/100
+    daprice = round(float(data.price) * 100)/100
     return {"status": True, "amount": data.price}
-
-
 @app.websocket("/itsdonebro")
 async def endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -67,7 +65,7 @@ async def scan():
   for client in conneceted_shi:
     await client.send_json({"status": True})
   return f"""
-    <!DOCTYPE html>
+<!DOCTYPE html>
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,16 +73,26 @@ async def scan():
       </head>
       <style>
         body {{
-          font-family: sans-serif; 
-          text-align: center; 
-          margin-top: 60px; 
-          background: #ffffff;
+          width: 100%;
+          height: 100vh;
+          font-family: sans-serif;
+          text-align: center;
+          overflow: hidden;
+          margin-top: 60px;
+          background-image: linear-gradient(to bottom, #0afa5e, #f0fdf4);
         }}
+        video {{
+        cursor: none;
+        overflow: hidden;
+  mix-blend-mode: multiply;
+  filter: contrast(0.8) brightness(1.2) saturate(1.2);
+}}
 
       </style>
       <body>
-        <video src="/videos/tickani.mp4" width="300px" height="300px" autoplay loop muted></video>
-        <h1 style="color: #16a34a; font-size: 40px; margin-bottom: 8px;">Success</h1>
+        <video src="./videos/tickani.mp4" width="300px" height="300px" autoplay loop muted></video>
+        <video src="./videos/tickani3.mp4" style="position: absolute; top:1px; left: 5px;" autoplay loop muted></video>
+        <h1 style="color: #16a34a; font-size: 40px; margin-bottom: 8px;">Success!!!</h1>
         <p style="font-size: 18px; color: #444;">Payment of {daprice} done ! Look at your order screen. Thank You!!!</p>
     </body>
 </html>
