@@ -508,6 +508,7 @@ input[type="text"] {
   scrollbar-width: thin;
   scrollbar-color: #ee3a03 #f1f1f1;
 }
+
 .addbtn{
   position: fixed;
   right: 20px;
@@ -666,6 +667,24 @@ input[type="text"] {
   justify-content: center;
   align-items: center;
   color: #f03c0f;
+  font-family: "Abel", sans-serif;
+  font-size: clamp(0.7rem ,1vw,2rem);
+  font-weight: 300;
+  transition:ease-in-out 0.1s;
+}
+.cancelbtndis{
+  position: absolute;
+  bottom: calc(100% - 96.5%);
+  right: calc(100% - 63%);
+  width:25%;
+  height: 7%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f03c0f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f03c0f71;
   font-family: "Abel", sans-serif;
   font-size: clamp(0.7rem ,1vw,2rem);
   font-weight: 300;
@@ -861,13 +880,20 @@ input[type="text"] {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 70px;
+  height: 25px;
   background-color: #f5f5f5;
   padding: 4px 6px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
 }
-
+.itemrowbill{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Roboto Condensed", sans-serif;
+}
 .qtybtn {
   width: 22px;
   height: 22px;

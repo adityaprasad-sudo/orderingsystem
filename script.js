@@ -54,10 +54,12 @@ let tabs = 1;
   }
   const tabscunt = document.querySelector(".tabs")
   const addbtn = document.querySelector(".addbtn")
+  
   const tableselec = document.querySelector(".selectdrop")
   const selectinput = document.getElementById("site-search")
   const filterbtns = document.querySelectorAll(".filterbtn")
   const billitmecontainer = document.createElement("div")
+  const billyboxshi = document.getElementById("billyshi")
   const billybox = document.querySelector(".billy")
   billitmecontainer.className = "billitems"
   billybox.appendChild(billitmecontainer)
@@ -89,7 +91,7 @@ socket.onopen = () => {
 socket.onmessage = (event) => {
     console.log(event.data)
     const data = JSON.parse(event.data)
-    pricesender()
+    
     if(data.status === true){
         const status = document.getElementById("paystatid")
         if(status){
@@ -191,10 +193,10 @@ socket.onmessage = (event) => {
             sumcont.innerHTML = "<p>No orders yet</p>"
             return
         }
-        const itemhtml = sumcont.items.map(item => `
-        <div class="sum-row">
+        const itemhtml = data.items.map(item => `
+        <div class="sumrow">
             <span>${item.qty}x ${item.title}</span>
-            <span>$${item.line_total.toFixed(2)}</span>
+            <span>$${item.linetotal.toFixed(2)}</span>
         </div>
         `).join("");
         sumcont.innerHTML = `
@@ -268,6 +270,48 @@ socket.onmessage = (event) => {
         })
     }
     const afterpay = document.getElementById("afterpayid")
+    const cancelbtn = document.querySelector(".cancelbtn")
+    function cancelorder(order){
+        if(!cancelbtn || !order) return;
+        const cancelbtndis = document.querySelector(".cancelbtndis")
+        if(order.permaoder){
+               cancelbtn.disabled = true;
+                cancelbtn.style.display = "none";
+                cancelbtndis.style.display = "flex";  
+                console.log("Order is permanent, cancel button disabled."); 
+        }else{
+            if(cancelbtndis) cancelbtndis.style.display = "none";
+            cancelbtn.style.display = "flex";
+            const timothy = order.canceltimer !== undefined ? order.canceltimer : 10;
+            cancelbtn.innerText = `Cancel Order(${timothy}s)`;
+        }
+    }
+    function timothystart(order){
+        if(order.timerid) clearInterval(order.timerid);
+        order.canceltimer = 10;
+        order.permaoder = false;
+        cancelorder(order);
+        order.timerid = setInterval(() => {
+            order.canceltimer--;
+            if(order.canceltimer <= 0){
+                clearInterval(order.timerid);
+                order.permaoder = true;
+                order.timerid = null;
+            }
+        },1000)
+    }
+    cancelbtn.addEventListener("click", () => {
+        const cur = orders[currentorderno];
+        if(!cur || cur.permaoder) return;
+        if(cur.timerid){
+            clearInterval(cur.timerid);
+            cur.timerid = null;
+        }
+        cur.locked = false
+        delete cur.summary
+        lockshi = false;
+        renderAll()
+    })
     function rendermoney(){
         if(!currentorderno || !orders[currentorderno]){
             warnbox.style.display = "flex"
@@ -280,6 +324,8 @@ socket.onmessage = (event) => {
             billybox.style.display = "none"
             afterpay.style.display = "flex"
             rendersummary(curroder.summary)
+            cancelorder(curroder)
+            return
         }
         afterpay.style.display = "none"
         const cart = orders[currentorderno].items
@@ -345,11 +391,11 @@ socket.onmessage = (event) => {
             curroder.summary = ordersumjson
             amountchig.textContent = "Scan to Pay $" + totalfinale.toFixed(2);
             lockshi = true
-            overlay.style.display = "flex"
-            orders[currentorderno].items = {}
+            timothystart(curroder)
             pricesender(ordersumjson)
-            renderAll();
+            renderAll()
         })
+        
     }
     document.querySelector(".paynow").addEventListener("click", () => {
     const cur = orders[currentorderno];
@@ -360,15 +406,8 @@ socket.onmessage = (event) => {
         overlay.style.display = "flex";
         pricesender(cur.summary);
     }
-    })
-    document.querySelector(".cancelbtn").addEventListener("click", () => {
-    if (orders[currentorderno]) {
-        orders[currentorderno].locked = false;
-        orders[currentorderno].items = {};
-        delete orders[currentorderno].summary;
-        renderAll();
-    }
-});
+})
+    
     function renderAll(){
         cardbtn()
         rendermoney()
