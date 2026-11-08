@@ -1,6 +1,7 @@
 import socket
 import qrcode
 import math
+import string
 from pydantic import BaseModel
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
@@ -26,6 +27,8 @@ class Ordersum(BaseModel):
     items: List[Orderitems]
     subtotal: float
     tax: float
+    platformfee: float
+    servicecharge: float
     total: float    
 
 lastestorder : Ordersum | None = None
@@ -91,6 +94,12 @@ async def scan():
             <div style="display:flex; justify-content:space-between; color:#666; margin-top: 8px;">
                 <span>Tax (5%)</span><span>${lastestorder.tax:.2f}</span>
             </div>
+            <div style="display:flex; justify-content:space-between; color:#666; margin-top: 8px;">
+                            <span>Service Charge (10%)</span><span>${lastestorder.servicecharge:.2f}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; color:#666; margin-top: 8px;">
+                                        <span>Platform Fee (2%)</span><span>${lastestorder.platformfee:.2f}</span>
+                                    </div>
             <div style="display:flex; justify-content:space-between; font-weight:bold; font-size: 17px; margin-top: 8px; border-top: 2px solid #222; padding-top: 6px;">
                 <span>Total Paid</span><span>${lastestorder.total:.2f}</span>
             </div>

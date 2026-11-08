@@ -273,22 +273,27 @@ socket.onmessage = (event) => {
     const cancelbtn = document.querySelector(".cancelbtn")
     function cancelorder(order){
         if(!cancelbtn || !order) return;
-        const cancelbtndis = document.querySelector(".cancelbtndis")
+        
         if(order.permaoder){
-               cancelbtn.disabled = true;
-                cancelbtn.style.display = "none";
-                cancelbtndis.style.display = "flex";  
-                console.log("Order is permanent, cancel button disabled."); 
+            const cancelbtndis = document.querySelector(".cancelbtndis")
+               cancelbtn.disabled = true
+                cancelbtn.style.display = "none"
+                cancelbtndis.style.display = "flex"
+                console.log("order is perma")
         }else{
-            if(cancelbtndis) cancelbtndis.style.display = "none";
-            cancelbtn.style.display = "flex";
-            const timothy = order.canceltimer !== undefined ? order.canceltimer : 10;
-            cancelbtn.innerText = `Cancel Order(${timothy}s)`;
+            const cancelbtndis = document.querySelector(".cancelbtndis")
+            if(cancelbtndis) cancelbtndis.style.display = "none"
+            cancelbtn.style.display = "flex"
+            const timothy = order.canceltimer !== undefined ? order.canceltimer : 10
+            let secrem = timothy % 60
+            let minrem = Math.floor(timothy / 60)
+            cancelbtn.innerText = `Cancel Order
+            (${minrem}m ${secrem}s)`
         }
     }
     function timothystart(order){
         if(order.timerid) clearInterval(order.timerid);
-        order.canceltimer = 10;
+        order.canceltimer = 180;
         order.permaoder = false;
         cancelorder(order);
         order.timerid = setInterval(() => {
@@ -298,7 +303,11 @@ socket.onmessage = (event) => {
                 order.permaoder = true;
                 order.timerid = null;
             }
+            cancelorder(order)
         },1000)
+        if(orders[currentorderno] === order){
+                cancelorder(order);
+            }
     }
     cancelbtn.addEventListener("click", () => {
         const cur = orders[currentorderno];
@@ -365,11 +374,15 @@ socket.onmessage = (event) => {
         })
         preptimevalue.textContent = `${15 + toitems * 2} min`
         const tax = subtotal * 0.05;
-        const grandtotal = subtotal + tax;
+        const servicecharge = subtotal * 0.1;
+        const platformfee = subtotal * 0.02; 
+        const grandtotal = subtotal + tax + servicecharge + platformfee;
         totalfinale = grandtotal;
         billfoot.innerHTML = `<div class="seperator2" style="width: auto;"></div>
         <div class="billsum"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
         <div class="billsum"><span>Tax(5%)</span><span>$${tax.toFixed(2)}</span></div>
+        <div class="billsum"><span>Service Charge(10%)</span><span>$${servicecharge.toFixed(2)}</span></div>
+        <div class="billsum"><span>Platform Fee(2%)</span><span>$${platformfee.toFixed(2)}</span></div>
         <div class="billsum total"><span>total</span><span>$${grandtotal.toFixed(2)}</span></div>
         <button class="checkoutbtn">Checkout(YES!)($${grandtotal.toFixed(2)})</button>`
         billfoot.querySelector(".checkoutbtn").addEventListener("click", () => {
@@ -385,6 +398,8 @@ socket.onmessage = (event) => {
                 })),
                 subtotal: Number(subtotal.toFixed(2)),
                 tax: Number(tax.toFixed(2)),
+                platformfee: Number(platformfee.toFixed(2)),
+                servicecharge: Number(servicecharge.toFixed(2)),
                 total: Number(grandtotal.toFixed(2))
             }
             curroder.locked = true
