@@ -6,6 +6,8 @@
   const aboutimg = document.getElementById("about")
   const feedbackimg = document.getElementById("feedback")
   const careimg = document.getElementById("care")
+  let platformfee = 0
+  let servicecharge = 0
   homebtn.addEventListener('mouseover', () => {
     img.src = "./assets/homehov.png";
   })
@@ -39,6 +41,7 @@ let tabs = 1;
   let nextorderno = 2
   let payedorder = 0
   let currentorderno = 1
+  let noclose = true
   let actcat = "All"
   const orders = {
     "1": { table: "tb1", items: {}, locked: false },
@@ -118,17 +121,21 @@ socket.onmessage = (event) => {
     })
     if(crossbtn){
         crossbtn.addEventListener("click", (e) => {
-            if(tabs>1){
             e.stopPropagation();
-            closeorder(orderid, tabel); 
-            tabs--;}
+            if(tabs>1){
+                if(!orders[orderid] || orders[orderid].locked === false){
+                    closeorder(orderid, tabel); 
+                    tabs--;
+                }else{
+                    alert("order is still in progress, please wait for the payment to complete or cancel the order");
+                }
+            }
             else{
                 alert("atleast have one order open");
             }
         })
     }
   }
-  
   document.querySelectorAll(".tabbtn").forEach((tabel) => {
       const match = tabel.innerText.match(/#(\d+)/);
       if (match){
@@ -205,6 +212,14 @@ socket.onmessage = (event) => {
         <span>Tax (5%)</span>
         <span>$${data.tax.toFixed(2)}</span>
         </div>
+        <div class="sumrow" style="color:#555; border:none;">
+        <span>service charge (5%)</span>
+        <span>$${servicecharge.toFixed(2)}</span>
+        </div>
+        <div class="sumrow" style="color:#555; border:none;">
+        <span>platform (5%)</span>
+        <span>$${platformfee.toFixed(2)}</span>
+        </div>
         <div class="sumtotal">
         <span>Total</span>
         <span>$${data.total.toFixed(2)}</span>
@@ -219,7 +234,7 @@ socket.onmessage = (event) => {
         if(!cart[itemid]){
             cart[itemid] = { title, price, qty: 0 }
         }
-        cart[itemid].qty += delta;
+        cart[itemid].qty += delta
         if(cart[itemid].qty <= 0){
             delete cart[itemid]
         }
@@ -242,10 +257,8 @@ socket.onmessage = (event) => {
             if(currentqty === 0){
                 const addbtn = document.createElement("button")
                 addbtn.className = "addbtncard"
-                
                 addbtn.innerText = lockedshi ? "Lock": "+ Add"
                 addbtn.disabled = lockedshi
-                
                 if(!lockedshi){
                     addbtn.addEventListener("click", () => {
                     itemquantity(itemid, title, price, 1)
@@ -274,7 +287,7 @@ socket.onmessage = (event) => {
     function cancelorder(order){
         if(!cancelbtn || !order) return;
         
-        if(order.permaoder){
+        if(order.permaoder === true){
             const cancelbtndis = document.querySelector(".cancelbtndis")
                cancelbtn.disabled = true
                 cancelbtn.style.display = "none"
@@ -292,9 +305,12 @@ socket.onmessage = (event) => {
         }
     }
     function timothystart(order){
-        if(order.timerid) clearInterval(order.timerid);
+        if(order.timerid){ clearInterval(order.timerid);
+            order.timerid = null;
+        }
         order.canceltimer = 180;
         order.permaoder = false;
+        if(orders[String(currentorderno)] === order) cancelorder(order);
         cancelorder(order);
         order.timerid = setInterval(() => {
             order.canceltimer--;
@@ -303,24 +319,25 @@ socket.onmessage = (event) => {
                 order.permaoder = true;
                 order.timerid = null;
             }
-            cancelorder(order)
+            if (orders[String(currentorderno)] === order) {
+            cancelorder(order);
+        }
         },1000)
-        if(orders[currentorderno] === order){
-                cancelorder(order);
-            }
     }
     cancelbtn.addEventListener("click", () => {
         const cur = orders[currentorderno];
-        if(!cur || cur.permaoder) return;
+        if(!cur || cur.permaoder === true) return;
         if(cur.timerid){
             clearInterval(cur.timerid);
             cur.timerid = null;
         }
+        noclose = false
         cur.locked = false
         delete cur.summary
         lockshi = false;
         renderAll()
     })
+    
     function rendermoney(){
         if(!currentorderno || !orders[currentorderno]){
             warnbox.style.display = "flex"
@@ -374,8 +391,8 @@ socket.onmessage = (event) => {
         })
         preptimevalue.textContent = `${15 + toitems * 2} min`
         const tax = subtotal * 0.05;
-        const servicecharge = subtotal * 0.1;
-        const platformfee = subtotal * 0.02; 
+        servicecharge = subtotal * 0.1;
+        platformfee = subtotal * 0.02; 
         const grandtotal = subtotal + tax + servicecharge + platformfee;
         totalfinale = grandtotal;
         billfoot.innerHTML = `<div class="seperator2" style="width: auto;"></div>
@@ -386,7 +403,9 @@ socket.onmessage = (event) => {
         <div class="billsum total"><span>total</span><span>$${grandtotal.toFixed(2)}</span></div>
         <button class="checkoutbtn">Checkout(YES!)($${grandtotal.toFixed(2)})</button>`
         billfoot.querySelector(".checkoutbtn").addEventListener("click", () => {
+            noclose = true
             const ordersumjson = {
+                
                 orderid: String(currentorderno),
                 table: curroder.table,
                 items: itemkey.map(id =>({
@@ -404,6 +423,7 @@ socket.onmessage = (event) => {
             }
             curroder.locked = true
             curroder.summary = ordersumjson
+            curroder.permaoder = false
             amountchig.textContent = "Scan to Pay $" + totalfinale.toFixed(2);
             lockshi = true
             timothystart(curroder)
@@ -422,7 +442,6 @@ socket.onmessage = (event) => {
         pricesender(cur.summary);
     }
 })
-    
     function renderAll(){
         cardbtn()
         rendermoney()
