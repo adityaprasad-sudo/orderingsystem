@@ -127,11 +127,15 @@ socket.onmessage = (event) => {
                     closeorder(orderid, tabel); 
                     tabs--;
                 }else{
-                    alert("order is still in progress, please wait for the payment to complete or cancel the order");
+                    document.querySelector(".overlay2").style.display = "flex"
+                    document.querySelector(".errortitle").innerText = "Order is locked"
+                    document.querySelector(".errortext").innerText = "You can't close locked order since this order is being processed by our chefs."
                 }
             }
             else{
-                alert("atleast have one order open");
+                document.querySelector(".overlay2").style.display = "flex"
+                document.querySelector(".errortitle").innerText = "Cannot Close"
+                document.querySelector(".errortext").innerText = "Atleast have one Tab Opened"
             }
         })
     }
@@ -139,6 +143,13 @@ socket.onmessage = (event) => {
   document.querySelectorAll(".tabbtn").forEach((tabel) => {
       const match = tabel.innerText.match(/#(\d+)/);
       if (match){
+        if (!tabel.querySelector(".orderinprog")) {
+            const badge = document.createElement("div");
+            badge.className = "orderinprog";
+            badge.style.display = "none";
+            badge.innerText = "Order In Progress";
+            tabel.appendChild(badge);
+        }
         tabshi(tabel,match[1])
       }
   })
@@ -147,7 +158,10 @@ socket.onmessage = (event) => {
   cross2.addEventListener("click", () => {
       overlay.style.display = "none"
   })
-
+ const tabbtn = document.querySelectorAll(".tabbtn")
+ document.getElementById("errorbtn").addEventListener("click", () => {
+     document.querySelector(".overlay2").style.display = "none"
+ })
   function switchorder(orderid){
     currentorderno = orderid
     document.querySelectorAll(".tabbtn").forEach((tab) => {
@@ -184,7 +198,7 @@ socket.onmessage = (event) => {
         orders[newid] = { table: tableselec.value, items: {}, locked: false };
         const newtab = document.createElement("div")
         newtab.className = "tabbtn"
-        newtab.innerHTML = `Order #${newid}<div class="cross">✖</div>`
+        newtab.innerHTML = `Order #${newid}<div class="cross">✖</div><div class="orderinprog" style="display:none;">Order In Progress</div>`
         tabscunt.appendChild(newtab)
         tabshi(newtab,newid)
         switchorder(newid)
@@ -225,6 +239,16 @@ socket.onmessage = (event) => {
         <span>$${data.total.toFixed(2)}</span>
         </div>
         `
+    }
+    function orderinprogbadge(){
+        document.querySelectorAll(".tabbtn").forEach((tab) => {
+        const id = tab.dataset.orderid;
+        const badge = tab.querySelector(".orderinprog");
+        const order = orders[id];
+        if (badge && order) {
+            badge.style.display = order.locked ? "block" : "none";
+        }
+    });
     }
     function itemquantity(itemid, title, price, delta){
         if(!currentorderno || !orders[currentorderno]){
@@ -288,12 +312,17 @@ socket.onmessage = (event) => {
         if(!cancelbtn || !order) return;
         
         if(order.permaoder === true){
+            
             const cancelbtndis = document.querySelector(".cancelbtndis")
                cancelbtn.disabled = true
                 cancelbtn.style.display = "none"
                 cancelbtndis.style.display = "flex"
+                tabbtn.forEach((tab) => {
+                        tab.style.backgroundColor = "#ff9100"
+                    })
                 console.log("order is perma")
         }else{
+            cancelbtn.disabled = false
             const cancelbtndis = document.querySelector(".cancelbtndis")
             if(cancelbtndis) cancelbtndis.style.display = "none"
             cancelbtn.style.display = "flex"
@@ -318,25 +347,48 @@ socket.onmessage = (event) => {
                 clearInterval(order.timerid);
                 order.permaoder = true;
                 order.timerid = null;
+                 orderinprogbadge()
             }
             if (orders[String(currentorderno)] === order) {
             cancelorder(order);
         }
         },1000)
     }
-    cancelbtn.addEventListener("click", () => {
-        const cur = orders[currentorderno];
-        if(!cur || cur.permaoder === true) return;
-        if(cur.timerid){
-            clearInterval(cur.timerid);
-            cur.timerid = null;
-        }
-        noclose = false
-        cur.locked = false
-        delete cur.summary
-        lockshi = false;
-        renderAll()
+    let iwantit = false
+    const cancelbtn2 = document.getElementById("cancelbtn2")
+    const okbtn = document.getElementById("idkbtn")
+    cancelbtn2.addEventListener("click", () => {
+        document.querySelector(".overlay3").style.display = "none"
+        
     })
+    okbtn.addEventListener("click", () => {
+    const   overlay3 = document.querySelector(".overlay3")
+        overlay3.style.display = "none";
+    const cur = orders[currentorderno];
+    if (!cur || cur.permaoder === true) return;
+
+    if (cur.timerid) {
+        clearInterval(cur.timerid);
+        cur.timerid = null;
+    }
+    noclose = false;
+    cur.locked = false;
+    cur.permaoder = false;
+    delete cur.summary;
+    lockshi = false;
+    renderAll();
+    })
+    console.log(iwantit)
+    cancelbtn.addEventListener("click", () => {
+        document.querySelector(".idktitle").innerText = "Are you sure?"
+        document.querySelector(".idktext").innerText = "You want to cancel this order?"
+        const overlay3 = document.querySelector(".overlay3")
+        const cur = orders[currentorderno];
+    if (!cur || cur.permaoder === true) return;
+    overlay3.style.display = "flex";
+        
+        })
+        
     
     function rendermoney(){
         if(!currentorderno || !orders[currentorderno]){
@@ -357,7 +409,7 @@ socket.onmessage = (event) => {
         const cart = orders[currentorderno].items
         const itemkey = Object.keys(cart)
         if(itemkey.length === 0){
-            warnbox.style.display =  "none"
+            warnbox.style.display =  "flex"
             billybox.style.display = "none"
             return
         }
@@ -445,6 +497,7 @@ socket.onmessage = (event) => {
     function renderAll(){
         cardbtn()
         rendermoney()
+        orderinprogbadge()
     }
     function filterlogic(){
         const filter = selectinput.value.toLowerCase().trim();
